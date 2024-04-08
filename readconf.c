@@ -179,6 +179,7 @@ typedef enum {
 	oPubkeyAcceptedAlgorithms, oCASignatureAlgorithms, oProxyJump,
 	oSecurityKeyProvider, oKnownHostsCommand, oRequiredRSASize,
 	oEnableEscapeCommandline, oObscureKeystrokeTiming, oChannelTimeout,
+	oRSAMinimumModulusSize,
 	oIgnore, oIgnoredUnknownOption, oDeprecated, oUnsupported
 } OpCodes;
 
@@ -329,6 +330,7 @@ static struct {
 	{ "enableescapecommandline", oEnableEscapeCommandline },
 	{ "obscurekeystroketiming", oObscureKeystrokeTiming },
 	{ "channeltimeout", oChannelTimeout },
+	{ "rsaminimummodulussize", oRSAMinimumModulusSize },
 
 	{ NULL, oBadOption }
 };
@@ -1586,6 +1588,20 @@ parse_pubkey_algos:
 		}
 		if (*activep && *log_level_ptr == SYSLOG_LEVEL_NOT_SET)
 			*log_level_ptr = (LogLevel) value;
+		break;
+
+	case oRSAMinimumModulusSize:
+		intptr = &SSH_RSA_MINIMUM_MODULUS_SIZE;
+		arg = argv_next(&ac, &av);
+		if ((errstr = atoi_err(arg, &value)) != NULL)
+			fatal("%s line %d: integer value %s.",
+			    filename, linenum, errstr);
+                if (value < SSH_RSA_MINIMUM_MODULUS_SIZE_HARD) {
+                    fatal("%s line %d: RSAMinimumModulusSize unacceptably small: %d",
+                          filename, linenum, value);
+                    
+                }
+                SSH_RSA_MINIMUM_MODULUS_SIZE = value;
 		break;
 
 	case oLogFacility:
@@ -3567,6 +3583,7 @@ dump_client_config(Options *o, const char *host)
 	dump_cfg_int(oRequiredRSASize, o->required_rsa_size);
 	dump_cfg_int(oObscureKeystrokeTiming,
 	    o->obscure_keystroke_timing_interval);
+	dump_cfg_int(oRSAMinimumModulusSize, SSH_RSA_MINIMUM_MODULUS_SIZE);
 
 	/* String options */
 	dump_cfg_string(oBindAddress, o->bind_address);

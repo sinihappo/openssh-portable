@@ -94,6 +94,8 @@ int	sshkey_private_serialize_opt(struct sshkey *key,
 static int sshkey_from_blob_internal(struct sshbuf *buf,
     struct sshkey **keyp, int allow_cert);
 
+int	SSH_RSA_MINIMUM_MODULUS_SIZE = SSH_RSA_MINIMUM_MODULUS_SIZE_DEFAULT;
+
 /* Supported key types */
 extern const struct sshkey_impl sshkey_ed25519_impl;
 extern const struct sshkey_impl sshkey_ed25519_cert_impl;
